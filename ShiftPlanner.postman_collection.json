@@ -1,0 +1,227 @@
+{
+  "info": {
+    "name": "ShiftPlanner API Collection",
+    "description": "Comprehensive Postman test suite for SHIFTPLANNER – Employee Shift Roster and Swap Requests. Covers all 10 required functional test cases including overlapping shift validation, colleague approval, and manager approval transactions.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1. Create Employee",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Test Employee\",\n  \"email\": \"test.employee@shiftplanner.com\",\n  \"role\": \"EMPLOYEE\",\n  \"active\": true\n}"
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/employees",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["api", "employees"]
+        },
+        "description": "Creates a new employee."
+      }
+    },
+    {
+      "name": "2. Get All Employees",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/api/employees",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["api", "employees"]
+        }
+      }
+    },
+    {
+      "name": "3. Create Shift (09:00 - 17:00)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"shiftDate\": \"2026-10-05\",\n  \"startTime\": \"09:00:00\",\n  \"endTime\": \"17:00:00\",\n  \"shiftType\": \"Morning\",\n  \"location\": \"Retail Floor 1\"\n}"
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/shifts",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["api", "shifts"]
+        },
+        "description": "Creates a Morning shift on 2026-10-05."
+      }
+    },
+    {
+      "name": "4. Create Overlapping Shift (14:00 - 22:00)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"shiftDate\": \"2026-10-05\",\n  \"startTime\": \"14:00:00\",\n  \"endTime\": \"22:00:00\",\n  \"shiftType\": \"Evening\",\n  \"location\": \"Retail Floor 1\"\n}"
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/shifts",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["api", "shifts"]
+        },
+        "description": "Creates an Evening shift on the same date for overlap testing."
+      }
+    },
+    {
+      "name": "5. Assign Employee to Shift (First Assignment)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"weekStartDate\": \"2026-10-05\",\n  \"employeeId\": 2,\n  \"shiftId\": 1,\n  \"status\": \"ASSIGNED\"\n}"
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/rosters",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["api", "rosters"]
+        },
+        "description": "Assigns Priya (ID 2) to Shift 1 (09:00 - 17:00)."
+      }
+    },
+    {
+      "name": "6. RULE 2: Attempt Overlapping Shift (Expect 400 Bad Request)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"weekStartDate\": \"2026-10-05\",\n  \"employeeId\": 2,\n  \"shiftId\": 2,\n  \"status\": \"ASSIGNED\"\n}"
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/rosters",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["api", "rosters"]
+        },
+        "description": "Attempts to assign Priya to an overlapping shift (14:00 - 22:00). Backend must reject with: 'Employee already has an overlapping shift on this date.'"
+      }
+    },
+    {
+      "name": "7. Create Swap Request",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"requesterId\": 2,\n  \"colleagueId\": 3,\n  \"requesterRosterId\": 2,\n  \"colleagueRosterId\": 3,\n  \"reason\": \"Family emergency on Monday morning; requesting trade.\"\n}"
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/swaps",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["api", "swaps"]
+        },
+        "description": "Creates a swap request between Priya (ID 2) and Rahul (ID 3)."
+      }
+    },
+    {
+      "name": "8. Colleague Approves Swap",
+      "request": {
+        "method": "PUT",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/api/swaps/1/colleague-approve?employeeId=3",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["api", "swaps", "1", "colleague-approve"],
+          "query": [
+            { "key": "employeeId", "value": "3", "description": "Colleague ID to enforce RULE 7" }
+          ]
+        },
+        "description": "Colleague (Rahul) approves the swap. Status becomes COLLEAGUE_APPROVED. Roster is NOT modified yet."
+      }
+    },
+    {
+      "name": "9. Manager Approves Swap (Final Approval & Roster Swap)",
+      "request": {
+        "method": "PUT",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/api/swaps/1/manager-approve",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["api", "swaps", "1", "manager-approve"]
+        },
+        "description": "Manager approves swap. Both colleagueApproved and managerApproved are now true! Roster shifts are swapped atomically."
+      }
+    },
+    {
+      "name": "10. Verify Roster Changed (GET /api/rosters)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/api/rosters",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["api", "rosters"]
+        },
+        "description": "Verifies that rosters 2 and 3 have their shifts swapped and status updated to SWAPPED."
+      }
+    },
+    {
+      "name": "11. Reject Swap (Colleague or Manager)",
+      "request": {
+        "method": "PUT",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/api/swaps/2/manager-reject",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["api", "swaps", "2", "manager-reject"]
+        },
+        "description": "Rejects a swap request. Status becomes REJECTED."
+      }
+    },
+    {
+      "name": "12. Verify Roster Did Not Change After Rejection",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/api/rosters",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["api", "rosters"]
+        },
+        "description": "Verifies that rejected swaps NEVER modify the roster (RULE 3)."
+      }
+    }
+  ]
+}

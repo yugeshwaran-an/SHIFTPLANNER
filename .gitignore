@@ -1,0 +1,21 @@
+# Maven Build Artifacts
+backend/target/
+backend/.mvn/
+backend/*.iml
+
+# Node.js & Vite Frontend
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+frontend/*.local
+
+# Logs and OS files
+*.log
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.suo
+*.user
